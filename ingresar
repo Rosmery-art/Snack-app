@@ -1,0 +1,79 @@
+import React from 'react';
+import { StyleSheet, View, Text, ImageBackground, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Importa el hook de navegación
+
+export default function Registro() {
+  const navigation = useNavigation(); // Hook para la navegación
+
+  return (
+    <ImageBackground
+      source={require('./assets/Registro.png')} // Asegúrate de que la ruta sea correcta
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>Ingresar como</Text>
+
+        {/* Botón para Maestro que navega a la pantalla Bienvenido2 */}
+        <TouchableOpacity 
+          style={styles.button}
+          onPress={() => navigation.navigate('registrom', { userType: 'maestro' })} // Navegar a Bienvenido2 (para maestro)
+        >
+          <Text style={styles.buttonText}>  MAESTRO  </Text>
+        </TouchableOpacity>
+        
+        {/* Botón para Estudiante que navega a la pantalla Bienvenido */}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('Bienvenido', { userType: 'estudiante' })} // Navegar a Bienvenido (para estudiante)
+        > 
+          <Text style={styles.buttonText}>ESTUDIANTE</Text>
+        </TouchableOpacity>
+      </View>
+    </ImageBackground>
+  );
+}
+
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    padding: 10,
+    marginBottom: 75,
+  },
+  title: {
+    fontSize: 35,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 150,
+  },
+  button: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 35,
+    paddingHorizontal: 100,
+    borderRadius: 16,
+    width: '100%',
+    alignItems: 'center',
+    marginVertical: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  buttonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#393939',
+    textAlign: 'center',
+  },
+});
