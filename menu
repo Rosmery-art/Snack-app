@@ -1,0 +1,202 @@
+import React, { useState, useCallback } from 'react';
+import { StyleSheet, View, Text, Image, TouchableOpacity, ImageBackground } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { db } from './anunciosConfig'; // Asegúrate de que la ruta sea correcta
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+
+export default function Menu() {
+  const navigation = useNavigation();
+  
+  const [selectedIcon, setSelectedIcon] = useState('home');
+  const [userId, setUserId] = useState('user123'); // Cambia esto por el ID de usuario real
+  const [hasVoted, setHasVoted] = useState(false); // Para controlar si el usuario ya votó
+
+  useFocusEffect(
+    useCallback(() => {
+      setSelectedIcon('home');
+      checkVoteStatus();
+    }, [])
+  );
+
+  const checkVoteStatus = async () => {
+    const docRef = doc(db, 'votaciones', userId); // Reemplaza 'votaciones' con el nombre de tu colección
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      setHasVoted(data.hasVoted);
+    } else {
+      // Si no existe el documento, significa que nunca ha votado
+      setHasVoted(false);
+    }
+  };
+
+  const handleVote = async (vote) => {
+    if (!hasVoted) {
+      await setDoc(doc(db, 'votaciones', userId), { hasVoted: true, vote: vote, date: new Date().toISOString() });
+      navigation.navigate('perfil');
+    } else {
+      alert('Ya has votado hoy.');
+    }
+  };
+
+  return (
+    <ImageBackground
+      source={require('./assets/menu.png')}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>BIENVENIDO AL MENÚ</Text>
+
+        <View style={styles.whiteBox}>
+          <Image
+            source={require('./assets/comida1.jpg')}
+            style={styles.foodImage}
+          />
+          <Text style={styles.foodText}>Pudding</Text>
+        </View>
+
+        <Text style={styles.refrigerioText}>¿Desea tomar el refrigerio?</Text>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handleVote('sí')}
+          >
+            <Text style={styles.buttonText}>SÍ</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handleVote('no')}
+          >
+            <Text style={styles.buttonText}>NO</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.iconContainer}>
+        <TouchableOpacity onPress={() => { setSelectedIcon('home'); navigation.navigate('menu'); }}>
+          <View style={styles.iconWrapper}>
+            <Image source={require('./assets/home.jpg')} style={[styles.icon]} />
+            {selectedIcon === 'home' && <View style={styles.overlay} />}
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => { setSelectedIcon('user'); navigation.navigate('perfil'); }}>
+          <View style={styles.iconWrapper}>
+            <Image source={require('./assets/user.jpg')} style={[styles.icon]} />
+            {selectedIcon === 'user' && <View style={styles.overlay} />}
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => { setSelectedIcon('notification'); navigation.navigate('anuncios'); }}>
+          <View style={styles.iconWrapper}>
+            <Image source={require('./assets/campana.jpg')} style={[styles.icon]} />
+            {selectedIcon === 'notification' && <View style={styles.overlay} />}
+          </View>
+        </TouchableOpacity>
+      </View>
+    </ImageBackground>
+  );
+}
+
+// Resto del código (estilos)
+
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    padding: 5,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginTop: 140,
+    marginBottom: 40,
+  },
+  refrigerioText: {
+    fontSize: 20,
+    color: '#FFFFFF',
+    marginBottom: 10,
+  },
+  whiteBox: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  foodImage: {
+    width: 200,
+    height: 150,
+    marginBottom: 5,
+  },
+  foodText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000000',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+  },
+  button: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 40,
+    alignItems: 'center',
+    marginVertical: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  buttonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#393939',
+    textAlign: "center",
+  },
+  iconContainer: {
+    position: 'absolute',
+    bottom: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  iconWrapper: {
+    position: 'relative',
+  },
+  icon: {
+    width: 40,
+    height: 40,
+  },
+  overlay: {
+    position: 'absolute',
+    top: -5,
+    left: -5,
+    right: -5,
+    bottom: -5,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255, 0, 0, 0.4)',
+  },
+});
