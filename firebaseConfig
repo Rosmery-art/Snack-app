@@ -1,0 +1,23 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth"; // Importar el módulo de autenticación si lo vas a usar
+import { getAnalytics } from "firebase/analytics"; // Esto es opcional, dependiendo de si lo necesitas
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBtKWe1dtfxmL_Byc1vZTcMf4edbzxtWKM",
+  authDomain: "login-ef6ea.firebaseapp.com",
+  projectId: "login-ef6ea",
+  storageBucket: "login-ef6ea.appspot.com",
+  messagingSenderId: "945661246815",
+  appId: "1:945661246815:web:8fb2ed264f7baa78bc8aea",
+  measurementId: "G-XM34ZDPQVK" // Este ID es opcional
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app); // Inicializar el servicio de autenticación
+const analytics = getAnalytics(app); // Inicializar Analytics (opcional)
+
+// Exportar los módulos que necesites
+export { app, auth, analytics };
