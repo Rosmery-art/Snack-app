@@ -1,0 +1,138 @@
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from './firebaseConfig'; // Importar auth desde tu configuración de Firebase
+
+export default function InicioSesion() {
+  const navigation = useNavigation();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleLogin = () => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        navigation.navigate('perfil'); // Cambia 'Perfil' por el nombre de la pantalla de perfil
+      })
+      .catch(error => setError(error.message));
+  };
+
+  return (
+    <ImageBackground
+      source={require('./assets/inicioSesion.png')} // Asegúrate de que la ruta sea correcta
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>INICIO DE SESIÓN</Text>
+
+        {/* Campo para el Email */}
+        <TextInput
+          style={styles.input}
+          placeholder="    Email    "
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={email} // Agrega el valor del email
+          onChangeText={setEmail} // Agrega el manejador de texto
+        />
+        
+        {/* Campo para la Contraseña */}
+        <TextInput
+          style={styles.input}
+          placeholder="Contraseña"
+          secureTextEntry={true}
+          value={password} // Agrega el valor de la contraseña
+          onChangeText={setPassword} // Agrega el manejador de texto
+        />
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleLogin} // Cambia la función para manejar el inicio de sesión
+        >
+          <Text style={styles.buttonText}>CONTINUAR</Text>
+        </TouchableOpacity>
+
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        <TouchableOpacity onPress={() => navigation.navigate('contraseña1')}>
+          <Text style={styles.infoText}>¿Olvidaste tu contraseña?</Text>
+        </TouchableOpacity>
+      </View>
+    </ImageBackground>
+  );
+}
+
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 2,
+    marginBottom: 140,
+    overflow: 'hidden',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 40,
+    paddingTop: 100,
+  },
+  input: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 40,
+    width: 280,
+    maxWidth: 280,
+    alignItems: 'center',
+    marginVertical: 15,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  button: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    borderRadius: 40,
+    width: '100%',
+    alignItems: 'center',
+    marginVertical: 25,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  buttonText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#393939',
+    textAlign: 'center',
+  },
+  infoText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    textAlign: 'center',
+  },
+  error: {
+    color: 'red',
+    marginBottom: 20,
+  },
+});
