@@ -1,0 +1,268 @@
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, Image, ImageBackground, TouchableOpacity, Modal, FlatList } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+
+export default function Registro() {
+  const navigation = useNavigation();
+
+  // Estado para manejar la imagen y el texto seleccionados
+  const [selectedImage, setSelectedImage] = useState(require('./assets/comida1.jpg'));
+  const [selectedText, setSelectedText] = useState("Pudding");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  
+  // Lista de imágenes predefinidas y sus textos
+  const foodOptions = [
+    { id: 1, image: require('./assets/comida1.jpg'), text: 'Pudding' },
+    { id: 2, image: require('./assets/comida2.jpg'), text: 'Sandwich' },
+    { id: 3, image: require('./assets/comida3.jpg'), text: 'Papitas' },
+  ];
+
+  // Estado para el icono seleccionado
+  const [selectedIcon, setSelectedIcon] = useState('home');
+
+  // Función para manejar la selección del icono
+  const handleIconPress = (iconName, route) => {
+    setSelectedIcon(iconName);  // Cambia el icono seleccionado
+    navigation.navigate(route); // Navega a la pantalla correspondiente
+  };
+
+  // Efecto para manejar el ícono seleccionado al volver a esta pantalla
+  useFocusEffect(
+    React.useCallback(() => {
+      // Aquí puedes verificar qué ícono debe estar seleccionado
+      const currentRoute = navigation.getState().routes[navigation.getState().index];
+      if (currentRoute.name === 'menu2') {
+        setSelectedIcon('home'); // Cambia esto según tu lógica
+      } else if (currentRoute.name === 'perfilm') {
+        setSelectedIcon('user');
+      } else if (currentRoute.name === 'anuncios2') {
+        setSelectedIcon('bell');
+      }
+    }, [navigation])
+  );
+
+  const handleSelectFood = (item) => {
+    setSelectedImage(item.image);
+    setSelectedText(item.text);
+    setIsModalVisible(false);
+  };
+
+  return (
+    <ImageBackground
+      source={require('./assets/menu.png')}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>BIENVENIDO AL MENÚ</Text>
+
+        <View style={styles.whiteBox}>
+          <Image
+            source={selectedImage}
+            style={styles.foodImage}
+          />
+          <Text style={styles.foodText}>{selectedText}</Text>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => setIsModalVisible(true)}
+          >
+            <Text style={styles.buttonText}>EDITAR</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => alert('¡Comida enviada con éxito!')}
+          >
+            <Text style={styles.buttonText}>ENVIAR</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Modal visible={isModalVisible} transparent={true} animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Selecciona una comida</Text>
+              <FlatList
+                data={foodOptions}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.modalItem}
+                    onPress={() => handleSelectFood(item)}
+                  >
+                    <Image source={item.image} style={styles.modalImage} />
+                    <Text style={styles.modalText}>{item.text}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setIsModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <View style={styles.iconContainer}>
+          <TouchableOpacity onPress={() => handleIconPress('home', 'menu2')}>
+            <View style={styles.iconWrapper}>
+              <Image source={require('./assets/home.jpg')} style={styles.icon} />
+              {selectedIcon === 'home' && <View style={styles.overlay} />}
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleIconPress('user', 'perfilm')}>
+            <View style={styles.iconWrapper}>
+              <Image source={require('./assets/user.jpg')} style={styles.icon} />
+              {selectedIcon === 'user' && <View style={styles.overlay} />}
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleIconPress('bell', 'anuncios2')}>
+            <View style={styles.iconWrapper}>
+              <Image source={require('./assets/campana.jpg')} style={styles.icon} />
+              {selectedIcon === 'bell' && <View style={styles.overlay} />}
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </ImageBackground>
+  );
+}
+
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    padding: 5,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginTop: 140,
+    marginBottom: 40,
+  },
+  whiteBox: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  foodImage: {
+    width: 200,
+    height: 150,
+    marginBottom: 5,
+  },
+  foodText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000000',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '90%',
+  },
+  button: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 40,
+    alignItems: 'center',
+    marginVertical: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  buttonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#393939',
+    textAlign: 'center',
+  },
+  iconContainer: {
+    position: 'absolute',
+    bottom: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  iconWrapper: {
+    position: 'relative',
+  },
+  icon: {
+    width: 40,
+    height: 40,
+  },
+  overlay: {
+    position: 'absolute',
+    top: -5,
+    left: -5,
+    right: -5,
+    bottom: -5,
+    borderRadius: 25, // El círculo debe tener bordes redondeados
+    backgroundColor: 'rgba(255, 0, 0, 0.4)', // Rojo semitransparente
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semitransparente
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  modalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  modalImage: {
+    width: 50,
+    height: 50,
+    marginRight: 10,
+  },
+  modalText: {
+    fontSize: 18,
+  },
+  closeButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#ccc',
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
